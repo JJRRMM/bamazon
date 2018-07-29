@@ -87,6 +87,7 @@ function bidAuction() {
         if (chosenItem.stock_quantity > parseInt(answer.bid)) {
            var quantity = chosenItem.stock_quantity - answer.bid;
            console.log(" for the update " + quantity);
+           console.log("chosen item is: "+ chosenItem.item_id);
            connection.query(
             "UPDATE products SET ? WHERE ?",
             [
@@ -94,7 +95,7 @@ function bidAuction() {
                 stock_quantity: chosenItem.stock_quantity - answer.bid
               },
               {
-                item_id: chosenItem.id
+                item_id: chosenItem.item_id
               }
             ],
             function(error) {
