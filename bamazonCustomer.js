@@ -43,6 +43,7 @@ function showAllProducts() {
 
 function bidAuction() {
   // query the database for all items in products
+  var chosenItem;
   connection.query("SELECT * FROM products", function(err, results) {
     if (err) throw err;
     // once you have the items, prompt the user for which they'd like to bid on
@@ -65,26 +66,32 @@ function bidAuction() {
         {
           name: "bid",
           type: "input",
-          message: "How many you like to buy ?"
+          message: "How many would you like to buy ?"
         }
       ])
       .then(function(answer) {
         // get the information of the chosen item
         var chosenItem;
-        for (var i = 0; i < results.length; i++) {
-          if (results[i].item_id === answer.choice) {
+        for (var i = 0; i < results.length; i++) {           
+          if (results[i].product_name === answer.choice) {
             chosenItem = results[i];
+            console.log("Results product name :" + results[i].product_name)
+            var j = i;            
+            console.log(chosenItem)                        
           }
+          
         }
-
+       
+        chosenItem = results[j]; 
         // determine if there is enough quantity
         if (chosenItem.stock_quantity > parseInt(answer.bid)) {
-          // if there is enough quantity then purchase.
-          connection.query(
+           var quantity = chosenItem.stock_quantity - answer.bid;
+           console.log(" for the update " + quantity);
+           connection.query(
             "UPDATE products SET ? WHERE ?",
             [
               {
-                stock_quantity: stock_quantity - answer.bid
+                stock_quantity: chosenItem.stock_quantity - answer.bid
               },
               {
                 item_id: chosenItem.id
@@ -93,17 +100,18 @@ function bidAuction() {
             function(error) {
               if (error) throw err;
               console.log("Item successfully purchased");
-              // start();
+              console.log("total cost is " + answer.bid * chosenItem.price);
+              showAllProducts();
             }
           );
         }
         else {
           // not enough quantity is left
           console.log("There is insufficient quantity....");
-          // start();
+          showAllProducts();
         }
       });
   });
+   
 }
-
 
